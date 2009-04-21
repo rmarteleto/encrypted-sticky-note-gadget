@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
-<ModulePrefs title="__UP_title__" description="This is an encrypted sticky note"
+<ModulePrefs title="__UP_title__" description="This is an encrypted sticky note. 
+This gadget provides a second layer of security for the data that is saved. It derives 
+from the Sticky Note gadget (at http://www.google.com/ig/modules/sticky.xml) 
+and it was modified to encrypt / decrypt the text that is added it. This is 
+an open-source gadget and its project page can be found at
+http://code.google.com/p/encrypted-sticky-note-gadget"
 	author="R.Marteleto" author_email="rmarteleto+encrypted-sticky-note@gmail.com"
 	singleton="false" category="tools" height="150">
 	<Require feature="dynamic-height"/>
