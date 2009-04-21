@@ -5,6 +5,7 @@
 	singleton="false" category="tools" height="150">
 	<Require feature="dynamic-height"/>
 	<Require feature="setprefs"/>
+	<Require feature="analytics"/>
 </ModulePrefs>
 <UserPref name="title" display_name="Title:" default_value="Encrypted Sticky Note"/>
 <UserPref name="savedText" default_value="" datatype="hidden"/>
@@ -16,7 +17,9 @@
 
 <Content type="html" view="home,canvas">
 <![CDATA[
-
+<script>
+  _IG_Analytics("UA-8480968-1", "/encrypted_sticky_note");
+</script>
 <script language="JavaScript">
 
 // create reference to gadget
