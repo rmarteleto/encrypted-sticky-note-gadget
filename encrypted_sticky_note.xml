@@ -7,7 +7,9 @@ and it was modified to encrypt / decrypt the text that is added it. This is
 an open-source gadget and its project page can be found at
 http://code.google.com/p/encrypted-sticky-note-gadget"
 	author="R.Marteleto" author_email="rmarteleto+encrypted-sticky-note@gmail.com"
-	singleton="false" category="tools" height="150">
+	singleton="false" category="tools" height="150"
+	directory_title="encrypted_sticky_note" 
+	title_url="http://code.google.com/p/encrypted-sticky-note-gadget/">
 	<Require feature="dynamic-height"/>
 	<Require feature="setprefs"/>
 	<Require feature="analytics"/>
