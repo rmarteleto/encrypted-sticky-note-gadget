@@ -12,6 +12,7 @@ http://code.google.com/p/encrypted-sticky-note-gadget/wiki/Help"
 	directory_title="encrypted_sticky_note" 
 	title_url="http://code.google.com/p/encrypted-sticky-note-gadget/"
 	screenshot="http://encrypted-sticky-note-gadget.googlecode.com/svn/trunk/screenshot.JPG">
+	thumbnail="http://encrypted-sticky-note-gadget.googlecode.com/svn/trunk/thumbnail.JPG"
 	<Require feature="dynamic-height"/>
 	<Require feature="setprefs"/>
 	<Require feature="analytics"/>
