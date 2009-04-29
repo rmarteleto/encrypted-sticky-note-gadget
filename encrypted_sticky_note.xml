@@ -131,7 +131,7 @@ function saveText__MODULE_ID__()
 		}
 		else
 		{
-			element.innerHTML = 'Error: your ' + encryptedText + 'text has reached 2000 characters and will not be saved due to Google gadget limitations!';
+			element.innerHTML = 'Warning: your ' + encryptedText + 'text has reached 2000 characters and will not be saved due to Google gadget limitations!';
 		}
 	}
 }
@@ -309,11 +309,13 @@ function setRows__MODULE_ID__()
 <style type="text/css">
 #error_div__MODULE_ID__ {
 font-size: 12px;
-font-family: courier;
-font-style: bold;
+font-family: verdana;
+font-weight: bold;
 border-width: 0px;
 background-color: #ffffff;
 color: #ff0000;
+text-decoration:blink;
+line-height:2; 
 }
 #textInputArea__MODULE_ID__ {
 font-size: 12px;
