@@ -9,7 +9,7 @@ http://code.google.com/p/encrypted-sticky-note-gadget. Help can be found at
 http://code.google.com/p/encrypted-sticky-note-gadget/wiki/Help"
 	author="R.Marteleto" author_email="rmarteleto+encrypted-sticky-note@gmail.com"
 	singleton="false" category="tools" height="150"
-	directory_title="encrypted_sticky_note" 
+	directory_title="Encrypted Sticky Note" 
 	title_url="http://code.google.com/p/encrypted-sticky-note-gadget/"
 	screenshot="http://encrypted-sticky-note-gadget.googlecode.com/svn/trunk/screenshot.JPG"
 	thumbnail="http://encrypted-sticky-note-gadget.googlecode.com/svn/trunk/thumbnail.JPG">
@@ -90,7 +90,7 @@ function initializeGadget__MODULE_ID__()
 // print UI based on use preference for labels
 function printHTML__MODULE_ID__(showLabel)
 {
-	var htmlCode = '<table style="width:100%;border:0px;font-family:arial;font-size:12px;">';
+	var htmlCode = '<div id="error_div__MODULE_ID__"></div><table style="width:100%;border:0px;font-family:arial;font-size:12px;">';
 	switch(showLabel)
 	{
 		case 'Partial':
@@ -115,11 +115,24 @@ function saveText__MODULE_ID__()
 	if (!textIsEncrypted__MODULE_ID__)
 	{
 		var toSave = plainTextTag + getCurrentText__MODULE_ID__();
-		
+		var encryptedText = '';
+
 		// check encryption option and use 256bit AES encryption algorithm
 		if (getEncryptionCheck__MODULE_ID__() && getKey__MODULE_ID__() != "" && getKey__MODULE_ID__() != resetKeyStr)
+		{
 			toSave = AESEncryptCtr(toSave, getKey__MODULE_ID__(), 256);
-		prefs__MODULE_ID__.set("savedText",toSave);
+			encryptedText = 'encrypted ';
+		}
+		var element = document.getElementById('error_div__MODULE_ID__');
+		if (toSave.length < 2000)
+		{
+			element.innerHTML = '';
+			prefs__MODULE_ID__.set("savedText",toSave);
+		}
+		else
+		{
+			element.innerHTML = 'Error: your ' + encryptedText + 'text has reached 2000 characters and will not be saved due to Google gadget limitations!';
+		}
 	}
 }
 
@@ -294,6 +307,14 @@ function setRows__MODULE_ID__()
 </script>
 
 <style type="text/css">
+#error_div__MODULE_ID__ {
+font-size: 12px;
+font-family: courier;
+font-style: bold;
+border-width: 0px;
+background-color: #ffffff;
+color: #ff0000;
+}
 #textInputArea__MODULE_ID__ {
 font-size: 12px;
 overflow:hidden;
