@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
 <ModulePrefs title="__UP_title__" description="
-This gadget provides a second layer of security for the data that is saved. It derives 
-from the Sticky Note gadget (at http://www.google.com/ig/modules/sticky.xml) 
-and it was modified to encrypt / decrypt the text that is added it. This is 
+This gadget provides a second layer of security for the data that is saved. It derives
+from the Sticky Note gadget (at http://www.google.com/ig/modules/sticky.xml)
+and it was modified to encrypt / decrypt the text that is added to it. This is
 an open-source gadget and its project page can be found at
 http://code.google.com/p/encrypted-sticky-note-gadget. Help can be found at
-http://code.google.com/p/encrypted-sticky-note-gadget/wiki/Help"
+http://code.google.com/p/encrypted-sticky-note-gadget/wiki/Help. Gadget update log can be
+found at http://code.google.com/p/encrypted-sticky-note-gadget/wiki/ChangeLog"
 	author="R.Marteleto" author_email="rmarteleto+encrypted-sticky-note@gmail.com"
 	singleton="false" category="tools" height="150"
-	directory_title="Encrypted Sticky Note" 
+	directory_title="Encrypted Sticky Note"
 	title_url="http://code.google.com/p/encrypted-sticky-note-gadget/"
 	screenshot="http://encrypted-sticky-note-gadget.googlecode.com/svn/trunk/screenshot.JPG"
 	thumbnail="http://encrypted-sticky-note-gadget.googlecode.com/svn/trunk/thumbnail.JPG">
@@ -27,9 +28,11 @@ http://code.google.com/p/encrypted-sticky-note-gadget/wiki/Help"
 
 <Content type="html" view="home,canvas">
 <![CDATA[
+
 <script>
-  _IG_Analytics("UA-8480968-1", "/encrypted_sticky_note");
+	_IG_Analytics("UA-8480968-1", "/encrypted_sticky_note");
 </script>
+
 <script language="JavaScript">
 
 // create reference to gadget
@@ -37,16 +40,16 @@ var prefs__MODULE_ID__= new _IG_Prefs(__MODULE_ID__); // initialize preference
 
 // special string used to define when text is not encrypted
 var plainTextTag = "<plain_text>";
-// special string used to reset the cipher key 
+// special string used to reset the cipher key
 var resetKeyStr = "Reset my key, please";
 
 // initialize text
 var currentText__MODULE_ID__ = plainTextTag + "Enter your text here!";
 var textIsEncrypted__MODULE_ID__ = false;
+var showKeyConfirmation__MODULE_ID__ = false;
 
 var textInputArea__MODULE_ID__ = null; // reference to main text area
 var keyInputArea__MODULE_ID__ = null; // reference to key text area
-var keyInputAreaReadOnly__MODULE_ID__ = null // reference to key password area
 var lockKeyCheckBox__MODULE_ID__ = null; // reference to check box
 var error_div__MODULE_ID__ = null; // reference to error message
 
@@ -66,7 +69,6 @@ function initializeGadget__MODULE_ID__()
 	// set reference to UI elements
 	textInputArea__MODULE_ID__ = _gel("textInputArea__MODULE_ID__");
 	keyInputArea__MODULE_ID__ = _gel("keyInputArea__MODULE_ID__");
-	keyInputAreaReadOnly__MODULE_ID__ = _gel("keyInputAreaReadOnly__MODULE_ID__");
 	lockKeyCheckBox__MODULE_ID__ = _gel("lockKey__MODULE_ID__");
 	error_div__MODULE_ID__ = _gel("error_div__MODULE_ID__");
 
@@ -74,10 +76,11 @@ function initializeGadget__MODULE_ID__()
 	var text = prefs__MODULE_ID__.getString("savedText");
 	if(text != "")
 		currentText__MODULE_ID__ = text;
-	
+
 	// check if text is encrypted
 	textIsEncrypted__MODULE_ID__ = isEncrypted__MODULE_ID__(currentText__MODULE_ID__);
-
+	showKeyConfirmation__MODULE_ID__ = !textIsEncrypted__MODULE_ID__;
+	
 	// display text
 	if (textIsEncrypted__MODULE_ID__)
 		displayTextEncryptedMessage__MODULE_ID__();
@@ -86,7 +89,7 @@ function initializeGadget__MODULE_ID__()
 
 	// set columns in text area
 	setCols__MODULE_ID__();
-	
+
 	// subscribe to resize event
 	_IG_AddDOMEventHandler(window,"resize",setCols__MODULE_ID__)
 }
@@ -98,18 +101,40 @@ function printHTML__MODULE_ID__(showLabel)
 	switch(showLabel)
 	{
 		case 'Partial':
-			htmlCode += '<tr><td>Key:</td><td style="width:100%"><input type="text" VALUE="" id="keyInputArea__MODULE_ID__"><input type="password" VALUE="" id="keyInputAreaReadOnly__MODULE_ID__" style="display:none"></td><td width="10"><input type="checkbox" value="1" id="lockKey__MODULE_ID__" onClick="lockKeyClick__MODULE_ID__()"></td></tr><tr><td>Text:</td><td colspan="2"><div id="textInputDiv__MODULE_ID__" style="backgroundColor:#ffffcc"><textarea id="textInputArea__MODULE_ID__" onblur="saveText__MODULE_ID__()" onmouseout="saveText__MODULE_ID__()" onkeyup="setRows__MODULE_ID__()"></textarea></div></td></tr>';
+			htmlCode += '<tr><td>Key:</td><td style="width:100%"><input type="password" VALUE="" id="keyInputArea__MODULE_ID__" onkeypress="handleEnter__MODULE_ID__(this, event)"></td><td width="10"><input type="checkbox" value="1" id="lockKey__MODULE_ID__" onClick="lockKeyClick__MODULE_ID__()"></td></tr><tr><td>Text:</td><td colspan="2"><div id="textInputDiv__MODULE_ID__" style="backgroundColor:#ffffcc"><textarea id="textInputArea__MODULE_ID__" onblur="saveText__MODULE_ID__()" onmouseout="saveText__MODULE_ID__()" onkeyup="setRows__MODULE_ID__()"></textarea></div></td></tr>';
 			break;
 		case 'No':
-			htmlCode += '<tr><td style="width:100%"><input type="text" VALUE="" id="keyInputArea__MODULE_ID__"><input type="password" VALUE="" id="keyInputAreaReadOnly__MODULE_ID__" style="display:none"></td><td width="10"><input type="checkbox" value="1" id="lockKey__MODULE_ID__" onClick="lockKeyClick__MODULE_ID__()"></td></tr><tr><td colspan="2"><div id="textInputDiv__MODULE_ID__" style="backgroundColor:#ffffcc"><textarea id="textInputArea__MODULE_ID__" onblur="saveText__MODULE_ID__()" onmouseout="saveText__MODULE_ID__()" onkeyup="setRows__MODULE_ID__()"></textarea></div></td></tr>';
+			htmlCode += '<tr><td style="width:100%"><input type="password" VALUE="" id="keyInputArea__MODULE_ID__" onkeypress="handleEnter__MODULE_ID__(this, event)"></td><td width="10"><input type="checkbox" value="1" id="lockKey__MODULE_ID__" onClick="lockKeyClick__MODULE_ID__()"></td></tr><tr><td colspan="2"><div id="textInputDiv__MODULE_ID__" style="backgroundColor:#ffffcc"><textarea id="textInputArea__MODULE_ID__" onblur="saveText__MODULE_ID__()" onmouseout="saveText__MODULE_ID__()" onkeyup="setRows__MODULE_ID__()"></textarea></div></td></tr>';
 			break;
 		default:
-			htmlCode += '<tr><td>Key</td><td style="width:100%;text-align:right">Activate key</td><td><input type="checkbox" value="1" id="lockKey__MODULE_ID__" onClick="lockKeyClick__MODULE_ID__()""></td></tr><tr><td colspan="3"><input type="text" VALUE="" id="keyInputArea__MODULE_ID__"><input type="password" VALUE="" id="keyInputAreaReadOnly__MODULE_ID__" style="display:none"></td></tr><tr><td colspan="3">Text</td></tr><tr><td colspan="3"><div id="textInputDiv__MODULE_ID__" style="backgroundColor:#ffffcc"><textarea id="textInputArea__MODULE_ID__" onblur="saveText__MODULE_ID__()" onmouseout="saveText__MODULE_ID__()" onkeyup="setRows__MODULE_ID__()"></textarea></div></td></tr>';
+			htmlCode += '<tr><td>Key</td><td style="width:100%;text-align:right">Activate key</td><td><input type="checkbox" value="1" id="lockKey__MODULE_ID__" onClick="lockKeyClick__MODULE_ID__()""></td></tr><tr><td colspan="3"><input type="password" VALUE="" id="keyInputArea__MODULE_ID__" onkeypress="handleEnter__MODULE_ID__(this, event)"></td></tr><tr><td colspan="3">Text</td></tr><tr><td colspan="3"><div id="textInputDiv__MODULE_ID__" style="backgroundColor:#ffffcc"><textarea id="textInputArea__MODULE_ID__" onblur="saveText__MODULE_ID__()" onmouseout="saveText__MODULE_ID__()" onkeyup="setRows__MODULE_ID__()"></textarea></div></td></tr>';
 	}
 	htmlCode += "</table>";
 
 	var element = document.getElementById('content_div');
 	element.innerHTML = htmlCode;
+}
+
+// handle ENTER key in password field
+function handleEnter__MODULE_ID__(inField, e)
+{
+var charCode;
+
+	if(e && e.which)
+	{
+		charCode = e.which;
+	}
+	else if(window.event)
+	{
+		e = window.event;
+		charCode = e.keyCode;
+	}
+
+	if(charCode == 13)
+	{
+		lockKeyCheckBox__MODULE_ID__.checked = !lockKeyCheckBox__MODULE_ID__.checked;
+		lockKeyClick__MODULE_ID__();
+	}
 }
 
 // save text
@@ -120,7 +145,7 @@ function saveText__MODULE_ID__()
 	{
 		var toSave = plainTextTag + getCurrentText__MODULE_ID__();
 		var encryptedText = '';
-
+	
 		// check encryption option and use 256bit AES encryption algorithm
 		if (getEncryptionCheck__MODULE_ID__() && getKey__MODULE_ID__() != "" && getKey__MODULE_ID__() != resetKeyStr)
 		{
@@ -163,10 +188,20 @@ function lockKeyClick__MODULE_ID__()
 	// if checkbox is checked and key is not the reset string, disable key area and try to decipher
 	if (getEncryptionCheck__MODULE_ID__() && getKey__MODULE_ID__() != resetKeyStr)
 	{
-		keyInputAreaReadOnly__MODULE_ID__.value = keyInputArea__MODULE_ID__.value;
-		keyInputAreaReadOnly__MODULE_ID__.style.display='';
-		keyInputArea__MODULE_ID__.style.display='none';
-		
+		if (showKeyConfirmation__MODULE_ID__)
+		{
+			var answer = confirm("Have you entered '" + getKey__MODULE_ID__() + "' as your key? Click OK to accept it or CANCEL to reject it.");
+			if (!answer)
+			{
+				lockKeyCheckBox__MODULE_ID__.checked = false;
+				keyInputArea__MODULE_ID__.value = "";
+				keyInputArea__MODULE_ID__.select();
+				return;
+			}
+			showKeyConfirmation__MODULE_ID__ = false;
+		}
+		keyInputArea__MODULE_ID__.setAttribute("id","keyInputAreaReadOnly__MODULE_ID__");
+		keyInputArea__MODULE_ID__.readOnly = true;
 		decryptText__MODULE_ID__();
 	}
 	// if key is the reset string and text is encrypted, reset key and text
@@ -175,20 +210,23 @@ function lockKeyClick__MODULE_ID__()
 		setCurrentText__MODULE_ID__("");
 		keyInputArea__MODULE_ID__.value = "";
 		lockKeyCheckBox__MODULE_ID__.checked = false;
+		showKeyConfirmation__MODULE_ID__ = true;
 	}
 	// if key is reset string and text is not encrypted, just empty the key area and uncheck checkbox
 	else if (getKey__MODULE_ID__() == resetKeyStr && !textIsEncrypted__MODULE_ID__)
 	{
 		keyInputArea__MODULE_ID__.value = "";
 		lockKeyCheckBox__MODULE_ID__.checked = false;
+		showKeyConfirmation__MODULE_ID__ = true;
 	}
-	// enable key area 
+	// enable key area
 	else
 	{
-		keyInputArea__MODULE_ID__.style.display = '';
-		keyInputAreaReadOnly__MODULE_ID__.style.display='none';
+		keyInputArea__MODULE_ID__.setAttribute("id","keyInputArea__MODULE_ID__");
+		keyInputArea__MODULE_ID__.readOnly = false;
+		showKeyConfirmation__MODULE_ID__ = true;
 	}
-	
+
 	// attempt to save text
 	saveText__MODULE_ID__();
 }
@@ -204,7 +242,7 @@ function decryptText__MODULE_ID__()
 	{
 		// decipher using 256bit AES decrypt algorithm
 		var text = AESDecryptCtr(currentText__MODULE_ID__, getKey__MODULE_ID__(), 256);
-		
+
 		// check if text has been successfully decrypted
 		if (isEncrypted__MODULE_ID__(text))
 		{
@@ -213,9 +251,9 @@ function decryptText__MODULE_ID__()
 		
 			// uncheck checkbox and set key area for editing
 			lockKeyCheckBox__MODULE_ID__.checked = false;
-			
-			keyInputArea__MODULE_ID__.style.display='';
-			keyInputAreaReadOnly__MODULE_ID__.style.display='none';
+
+			keyInputArea__MODULE_ID__.setAttribute("id","keyInputArea__MODULE_ID__");
+			keyInputArea__MODULE_ID__.readOnly = false;
 		}
 		else
 		{
@@ -242,13 +280,13 @@ function getKey__MODULE_ID__()
 	return trim__MODULE_ID__(keyInputArea__MODULE_ID__.value);
 }
 
-// get trimmed text from HTML element 
+// get trimmed text from HTML element
 function getCurrentText__MODULE_ID__()
 {
 	return trim__MODULE_ID__(textInputArea__MODULE_ID__.value);
 }
 
-// set text to text area 
+// set text to text area
 function setCurrentText__MODULE_ID__(value)
 {
 	currentText__MODULE_ID__ = value;
@@ -275,7 +313,7 @@ function isEncrypted__MODULE_ID__(text)
 	return (text.substring(0,12) != plainTextTag );
 }
 
-// set columns in text area 
+// set columns in text area
 function setCols__MODULE_ID__()
 {
 	textInputArea__MODULE_ID__.setAttribute("cols",Math.floor(textInputArea__MODULE_ID__.clientWidth/9));
@@ -319,7 +357,7 @@ border-width: 0px;
 background-color: #ffffff;
 color: #ff0000;
 text-decoration:blink;
-line-height:2; 
+line-height:2;
 }
 #textInputArea__MODULE_ID__ {
 font-size: 12px;
